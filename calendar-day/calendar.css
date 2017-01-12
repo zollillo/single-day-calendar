@@ -1,0 +1,160 @@
+/* Global CSS variables (custom properties) */
+  :root {
+    --event-color: #50b089;
+    --calendar-width: 600px;
+    --calendar-height: 720px;
+  }
+
+
+/* Global page layout styles
+================================== */
+
+html {
+  font-size: 62.5%  /* 1em = 10px */
+}
+
+body {
+  font-size: 1.4em;
+  font-family: 'Lucida Sans Unicode', 'Lucida Grande', sans-serif;
+  box-sizing: border-box;
+  margin: 0 auto;
+  padding: 1em;
+  width: 100%;
+  background-color: #fff;
+  line-height: 1;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+
+/* Calendar specific layout styles
+================================== */
+
+/* === Wrapping container === */
+.calendar-day {
+  display: flex;
+  justify-content: center;
+}
+
+
+/* === Time slots bar === */
+.time-slots {
+  height: var(--calendar-height);
+  margin-top: 0;
+}
+
+.slot {
+  position: relative;
+  width: 90px;
+  height: 60px;
+  padding-right: 10px;
+}
+
+.slot-from,
+.slot-to {
+  color: rgba(0, 0, 0, .54);
+  font-size: 1.3em;
+  font-weight: bold;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.slot-from {
+  position: absolute;
+  top: -6px;
+  right: 10px;
+}
+
+.slot-from::after,
+.slot-to::after {
+  content: "\2002"attr(data-period);
+  color: rgba(0, 0, 0, .34);
+  font-weight: bold;
+  font-size: .8em;
+}
+
+.slot-half {
+  position: absolute;
+  top: 30px;
+  right: 10px;
+  font-weight: bold;
+  color: rgba(0, 0, 0, .34);
+  transform: translateY(-50%);
+  text-align: right;
+}
+
+.slot-to {
+  position: absolute;
+  right: 10px;
+  bottom: -6px;
+  visibility: hidden;
+}
+
+li.slot:last-of-type .slot-to {
+  visibility: visible;
+}
+
+
+
+/* === Events === */
+/* HEADS UP: Applying 'position: relative' to both '.events' and '.event-list'
+ is required for ensuring that the 'padding' is not ignored when we apply 'position: absolute'
+ to the children.
+ See http://stackoverflow.com/questions/17115344/absolute-positioning-ignoring-padding-of-parent
+ */
+.events {
+  position: relative;
+  width: var(--calendar-width);
+  height: var(--calendar-height);
+  padding: 0 10px;
+  background-color: #ededed;
+  border-left: 1px solid #ddd;
+}
+
+.event-list {
+  position: relative;
+}
+
+.event-item {
+  position: absolute;
+}
+
+.event-details {
+  position: relative;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-left: 0; /* HEADS UP: left border is created with ::before */
+  color: var(--event-color);
+  font-size: 1em;
+  font-weight: bold;
+  height: 100%;
+  overflow: hidden;
+}
+
+.event-details::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 5px;
+  bottom: 0;
+  background: var(--event-color);
+  width: 5px;
+  content: "";
+}
+
+.event-title{
+  padding: 8px 0 0 15px;
+  margin: 0;
+}
+
+.event-location {
+  color: rgba(0, 0, 0, .54);
+  font-weight: 200;
+  font-size: .9em;
+  padding: 4px 0 0 15px;
+  margin: 0;
+}
