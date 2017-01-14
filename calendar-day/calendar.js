@@ -38,18 +38,28 @@ function layOutDay(events) {
   // Clear the DOM.
   eventList.innerHTML = '';
 
-  // Available vertical space
-  const containerHeight = 720; //eventList.parentElement.clientHeight;
-
-  const heightPerMinute = containerHeight / hours.length / 60;
-
+  const minutesTotal = 720;
+  const heightPerMinute = minutesTotal / hours.length / 60;
   const eventMinHeight = 40;
-  const W = 100;
+  const W = 100; // Base event width (in percent)
+  const numberOfEvents = [];
 
   // Make sure events are ordered ascending by start time.
   // In doing so, we can check if subsequent events collide in time.
   const eventsOrderedAsc = events.sort((a, b) => a.start - b.start);
   // console.table(eventsOrderedAsc);
+
+  // How many events happen at the same time in any given minute?
+  for (let minute = 0; minute <= minutesTotal; minute++) {
+    for (let i = 0; i < eventsOrderedAsc.length; i++) {
+      if (minute >= events[i].start && minute <= events[i].end) {
+        numberOfEvents[minute] = !numberOfEvents[minute] ? 1 : numberOfEvents[minute] + 1;
+      }
+    }
+  }
+  // console.log(numberOfEvents);
+
+
 
   const laidOutEvents = eventsOrderedAsc.map((event, index, array) => {
     // Event duration in minutes
@@ -59,23 +69,36 @@ function layOutDay(events) {
     // minimum height for short events.
     const eventHeight = duration * heightPerMinute < 15 ? eventMinHeight : duration * heightPerMinute;
 
+    // Number of how many events collide in time with the current one (incl. the current event).
+    // We use this factor to adjust the width as well as the horizontal position accordingly
+    // for preventing visually overlapping events.
+    // (e.g., a factor of 3 will give us a width of 33,3333% (think of 3 columns)).
+    const factor = Math.max(numberOfEvents[event.start], numberOfEvents[event.end]);
+
     // Does the next event collide in time with the current one?
-    // If so, we adjust their width and positioning.
-    // NOTE This only works for 2 colliding events.
-    // TODO Make it work for 2++ colliding events.
+    // If so, we assign a value to adjust its horizontal position.
     if (array[index+1] && (array[index+1].start < array[index].end)) {
-      array[index].width = W * 0.5;
-      array[index+1].width = W * 0.5;
-      array[index+1].left = array[index].left === 50 ? 0 : 50;
+      // Is the current event's horizontal position already adjusted?
+      // Then we check if there is also an overlap between the next event
+      // and the previous event.
+      if (array[index].xPos) {
+        if (array[index+1].start > array[index-1].end) {
+          array[index+1].xPos = array[index-1].xPos;
+        } else {
+          array[index+1].xPos = array[index].xPos + 1
+        }
+      } else {
+        array[index+1].xPos = 1;
+      }
     }
 
     const laidOut = {
       start: event.start,
       end: event.end,
-      width: event.width || W,
+      width: W / factor,
       height: eventHeight,
       top: event.start,
-      left: event.left || 0
+      left: W / factor * event.xPos || 0
     }
     return laidOut;
   });
