@@ -79,8 +79,8 @@ function layOutDay(events) {
     // If so, we assign a value to adjust its horizontal position.
     if (array[index+1] && (array[index+1].start < array[index].end)) {
       // Is the current event's horizontal position already adjusted?
-      // Then we check if there is also an overlap between the next event
-      // and the previous event.
+      // Then we check whether the start of the next event overlaps
+      // with the end of the previous event in order to avoid wasting vertical space.
       if (array[index].xPos) {
         if (array[index+1].start > array[index-1].end) {
           array[index+1].xPos = array[index-1].xPos;
